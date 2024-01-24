@@ -1,7 +1,36 @@
+"use server";
 import Pagination from "@/components/Pagination";
 import Product from "@/components/Product";
-// import DummyMobile from "";
-const Home = () => {
+import { prisma } from "@/utils/prisma";
+
+// async function getProducts() {
+//   const data = await prisma.product.findMany({
+//     select: {
+//       productName: true,
+//       id: true,
+//       price: true,
+//     },
+//     orderBy: {
+//       createdAt: "desc",
+//     },
+//   });
+//   return data;
+// }
+async function createProduct() {
+  const product = await prisma.product.create({
+    data: {
+      productName: "pixel 6a",
+      descrition: "mobilePhone",
+      price: 20000,
+      quantity: 200,
+    },
+  });
+  return product;
+}
+
+const Home = async () => {
+  const data = await createProduct();
+  console.log({ data });
   return (
     <div className="mx-16 my-3">
       <div className="grid grid-cols-4 gap-5 ">
