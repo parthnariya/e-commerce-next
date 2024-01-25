@@ -23,7 +23,6 @@ export class ProductRepository {
       select: {
         price: true,
         productName: true,
-        description: true,
         id: true,
         image: true,
       },
