@@ -1,40 +1,41 @@
-"use server";
+"use client";
 import Pagination from "@/components/Pagination";
 import Product from "@/components/Product";
-import { prisma } from "@/utils/prisma";
-
-// async function getProducts() {
-//   const data = await prisma.product.findMany({
-//     select: {
-//       productName: true,
-//       id: true,
-//       price: true,
-//     },
-//     orderBy: {
-//       createdAt: "desc",
-//     },
-//   });
-//   return data;
-// }
-async function createProduct() {
-  const product = await prisma.product.create({
-    data: {
-      productName: "pixel 6a",
-      descrition: "mobilePhone",
-      price: 20000,
-      quantity: 200,
-    },
+import { useEffect, useState } from "react";
+async function getProducts() {
+  const res = await fetch("/api/product", {
+    method: "GET",
   });
-  return product;
+  if (!res.ok) {
+    console.log("res", res);
+    return;
+  }
+  const products = await res.json();
+  return products;
 }
 
-const Home = async () => {
-  const data = await createProduct();
-  console.log({ data });
+const Home = () => {
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const data = await getProducts();
+      console.log(data);
+      setProducts(() => data);
+    })();
+  }, []);
   return (
     <div className="mx-16 my-3">
       <div className="grid grid-cols-4 gap-5 ">
-        <Product
+        {products.map((item) => (
+          <Product
+            key={item.id}
+            id={item.id}
+            image={item.image}
+            price={item.price}
+            title={item.productName}
+          />
+        ))}
+        {/* <Product
           id="1"
           image="https://api.slingacademy.com/public/sample-photos/1.jpeg"
           price="20000"
@@ -63,7 +64,7 @@ const Home = async () => {
           image="https://api.slingacademy.com/public/sample-photos/1.jpeg"
           price="20000"
           title="Pixel 7"
-        />
+        /> */}
       </div>
       <Pagination />
     </div>

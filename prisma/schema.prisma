@@ -10,7 +10,8 @@ datasource db {
 model Product {
   id          String   @id @default(uuid()) @map("_id")
   productName String
-  descrition  String
+  image       String
+  description String
   price       Float
   quantity    Int
   createdAt   DateTime @default(now())
