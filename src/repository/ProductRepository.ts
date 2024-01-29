@@ -1,4 +1,6 @@
 import { prisma } from "@/library/prisma";
+import { revalidatePath } from "next/cache";
+import { env } from "process";
 
 export class ProductRepository {
   async createProduct(
@@ -18,15 +20,28 @@ export class ProductRepository {
       },
     });
   }
-  async getProducts() {
+  async getProducts(skip = 0) {
+    const take = typeof env.PAGE_SIZE === "string" ? +env.PAGE_SIZE : 8;
     const data = await prisma.product.findMany({
+      take,
+      skip: (skip - 1) * take,
       select: {
         price: true,
         productName: true,
         id: true,
         image: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
-    return data;
+    const total = await prisma.product.count();
+    revalidatePath("/");
+    return {
+      data,
+      metadata: {
+        hasNextPage: (skip - 1) * take + take < total,
+      },
+    };
   }
 }

@@ -1,15 +1,18 @@
 import { ProductRepository } from "@/repository/ProductRepository";
 import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const productRepository = new ProductRepository();
-  const data = await productRepository.getProducts();
-  if (data.length === 0) {
+  const { searchParams } = new URL(request.url);
+  const pageParam = searchParams.get("page");
+  const id = typeof pageParam === "string" ? +pageParam : 0;
+  const result = await productRepository.getProducts(id);
+  if (result.data.length === 0) {
     return new Response("No Products Found", {
       status: 404,
     });
   } else {
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(result), {
       status: 200,
     });
   }
