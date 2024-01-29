@@ -4,7 +4,7 @@ import Image from "next/image";
 type ProductPropsType = {
   id: string;
   title: string;
-  price: string;
+  price: number;
   image: string;
 };
 const Product = (props: ProductPropsType) => {

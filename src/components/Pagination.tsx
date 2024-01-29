@@ -2,36 +2,60 @@
 import Image from "next/image";
 import LeftArrowIcon from "../assets/LeftArrowIcon.svg";
 import RightArrowIcon from "../assets/RightArrowIcon.svg";
-function Pagination() {
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+
+type PaginationPropType = {
+  hasNextPages: boolean;
+};
+
+function Pagination({ hasNextPages }: PaginationPropType) {
+  const searchParams = useSearchParams();
+  const pageNumber = searchParams.get("page");
+  const currentPage = pageNumber ? +pageNumber : 1;
+
   return (
-    <div className="w-full flex items-center justify-center border-t border-gray-200">
-      <div className="flex items-center pt-3 mr-4 text-gray-600 hover:text-indigo-700 cursor-pointer">
-        <Image src={LeftArrowIcon} alt="LeftArrowIcon" />
-        <p className="text-sm ml-3 font-medium leading-none ">Previous</p>
-      </div>
-      <div className="flex">
-        <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
-          1
-        </p>
-        <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
-          2
-        </p>
-        <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
-          3
-        </p>
-        <p className="text-sm font-medium leading-none cursor-pointer text-indigo-700 border-t border-indigo-400 pt-3 mr-4 px-2">
-          4
-        </p>
-        <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
-          5
-        </p>
-      </div>
-      <div className="flex items-center pt-3 mr-4 text-gray-600 hover:text-indigo-700 cursor-pointer">
-        <p className="text-sm font-medium leading-none mr-3">Next</p>
-        <Image src={RightArrowIcon} alt="RightArrowIcon" />
+    <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center gap-2">
+        {currentPage !== 1 && (
+          <Link
+            className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-full text-center align-middle font-sans text-xs font-medium uppercase text-indigo-700 transition-all hover:bg-indigo-400 active:bg-indigo-400 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            href={`/?page=${currentPage - 1}`}
+          >
+            <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+              {currentPage - 1}
+            </span>
+          </Link>
+        )}
+        <button
+          className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-full text-center align-middle font-sans text-xs font-medium uppercase text-indigo-700 transition-all hover:bg-indigo-400 bg-indigo-400 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+          type="button"
+        >
+          <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+            {currentPage}
+          </span>
+        </button>
+        {hasNextPages && (
+          <Link
+            className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-full text-center align-middle font-sans text-xs font-medium uppercase text-indigo-700 transition-all hover:bg-indigo-400 active:bg-indigo-400 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            href={`/?page=${currentPage + 1}`}
+          >
+            <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+              {currentPage + 1}
+            </span>
+          </Link>
+        )}
       </div>
     </div>
   );
 }
+{
+  /* */
+}
+/* hover:text-indigo-700 */
+/* border-indigo-400  */
+/*  */
 
 export default Pagination;
