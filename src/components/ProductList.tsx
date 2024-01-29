@@ -1,28 +1,27 @@
 "use client";
-import Pagination from "@/components/Pagination";
-import Product from "@/components/Product";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import Product from "./Product";
+import Pagination from "./Pagination";
+import Loading from "./UI/Loading";
 type ProductType = {
   price: number;
   productName: string;
   id: string;
   image: string;
 };
-
 async function getProducts(page: number) {
   const res = await fetch(`/api/product?page=${page}`, {
     method: "GET",
   });
+
   if (!res.ok) {
     return;
   }
   const products = await res.json();
   return products;
 }
-
-const Products = () => {
+const ProductList = () => {
   const searchParams = useSearchParams();
   const pageNumber = searchParams.get("page");
 
@@ -39,11 +38,10 @@ const Products = () => {
       setLoading(false);
     })();
   }, [pageNumber]);
-
   return (
     <div className="mx-16 my-3 flex flex-col justify-between h-full">
       {loading ? (
-        <div>loading...</div>
+        <Loading />
       ) : (
         products && (
           <>
@@ -66,4 +64,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductList;
