@@ -1,12 +1,16 @@
-import { notFound } from "next/navigation";
+import ProductView from "@/components/ProductView";
+import Loading from "@/components/UI/Loading";
+import { Suspense } from "react";
 type ProductDescriptionPropType = {
   params: { productId: string };
 };
-function ProductDescription({ params }: ProductDescriptionPropType) {
-  if (+params.productId > 200) {
-    notFound();
-  }
-  return <div>Product Id: {params.productId}</div>;
+
+async function ProductDescription({ params }: ProductDescriptionPropType) {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ProductView id={`${params.productId}`} />
+    </Suspense>
+  );
 }
 
 export default ProductDescription;

@@ -4,14 +4,10 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const productRepository = new ProductRepository();
   const { searchParams } = new URL(request.url);
-  const productIdParam = searchParams.get("productId");
-  if (!productIdParam) {
-    return new Response("Invalid ProductID", {
-      status: 400,
-    });
-  }
-  const result = await productRepository.getProduct(productIdParam);
-  if (!result) {
+  const pageParam = searchParams.get("page");
+  const id = typeof pageParam === "string" ? +pageParam : 0;
+  const result = await productRepository.getProducts(id);
+  if (result.data.length === 0) {
     return new Response("No Products Found", {
       status: 404,
     });
