@@ -10,7 +10,7 @@ export class ProductRepository {
     image: string,
     quantity: number
   ) {
-    await prisma.product.create({
+    const data = await prisma.product.create({
       data: {
         productName,
         description,
@@ -19,6 +19,7 @@ export class ProductRepository {
         image,
       },
     });
+    return data;
   }
   async getProducts(skip = 0) {
     const take = typeof env.PAGE_SIZE === "string" ? +env.PAGE_SIZE : 8;
@@ -43,5 +44,21 @@ export class ProductRepository {
         hasNextPage: (skip - 1) * take + take < total,
       },
     };
+  }
+
+  async getProduct(productId: string) {
+    const data = await prisma.product.findFirst({
+      select: {
+        productName: true,
+        image: true,
+        price: true,
+        description: true,
+        id: true,
+      },
+      where: {
+        id: productId,
+      },
+    });
+    return data;
   }
 }

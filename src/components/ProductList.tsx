@@ -11,7 +11,7 @@ type ProductType = {
   image: string;
 };
 async function getProducts(page: number) {
-  const res = await fetch(`/api/product?page=${page}`, {
+  const res = await fetch(`/api/productList?page=${page}`, {
     method: "GET",
   });
 
