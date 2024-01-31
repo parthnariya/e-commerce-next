@@ -1,4 +1,7 @@
+import Cart from "@/components/Cart";
+import Loading from "@/components/UI/Loading";
 import { ProductRepository } from "@/repository/ProductRepository";
+import { Suspense } from "react";
 
 async function createProduct() {
   const desc =
@@ -12,9 +15,13 @@ async function createProduct() {
     30
   );
 }
-async function Cart() {
+function CartPage() {
   // await createProduct()
-  return <div>Cart</div>;
+  return (
+    <Suspense fallback={<Loading />}>
+      <Cart />
+    </Suspense>
+  );
 }
 
-export default Cart;
+export default CartPage;
