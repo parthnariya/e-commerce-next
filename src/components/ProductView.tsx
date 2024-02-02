@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import Loading from "./UI/Loading";
 
 type ProductViewPropsType = {
@@ -23,11 +23,35 @@ async function getProduct(productId: string) {
   const product = await res.json();
   return product;
 }
+
+async function addItem(productId: string) {
+  try {
+    const res = await fetch("/api/cart", {
+      method: "POST",
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    if (!res.ok) {
+      return;
+    }
+    const data = await res.json();
+    return data;
+  } catch (e) {
+  }
+}
+
 const ProductView = ({ id }: ProductViewPropsType) => {
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [productData, setProductData] = useState<
     ProductDetailsType | undefined
   >();
+
+  const addToCartHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
+    setButtonLoading(true);
+    const data = await addItem(id);
+    setButtonLoading(false);
+  };
 
   useEffect(() => {
     (async () => {
@@ -67,8 +91,11 @@ const ProductView = ({ id }: ProductViewPropsType) => {
               <span className="text-lg font-semibold text-gray-900 mr-2">
                 $ {productData.price}
               </span>
-              <button className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700">
-                Add to Cart
+              <button
+                onClick={addToCartHandler}
+                className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700"
+              >
+                {buttonLoading ? "Adding...." : "Add to Cart"}
               </button>
             </div>
           </div>

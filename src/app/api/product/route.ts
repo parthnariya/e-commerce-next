@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const productIdParam = searchParams.get("productId");
   if (!productIdParam) {
     return new Response("Invalid ProductID", {
-      status: 400,
+      status: 404,
     });
   }
   const result = await productRepository.getProduct(productIdParam);
