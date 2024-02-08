@@ -3,10 +3,23 @@ import ProfileIcon from "../assets/profileIcon.svg";
 import CartIcon from "../assets/cartIcon.svg";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext } from "react";
-import { UserContext } from "@/context/userContext";
+import { useContext, useEffect } from "react";
+import { UserContext, setCartItemCount } from "@/context/userContext";
+
+const getCartItemCount = async () => {
+  const res = await fetch("/api/cart/itemscount", { method: "GET" });
+  const count = await res.json();
+  return count;
+};
+
 const Navbar = () => {
-  const [state, ] = useContext(UserContext);
+  const [state, dispatch] = useContext(UserContext);
+  useEffect(() => {
+    (async () => {
+      const count = await getCartItemCount();
+      dispatch(setCartItemCount(count));
+    })();
+  }, [dispatch]);
   return (
     <header className="inline row-start-1 row-end-2  col-start-2 col-end-12">
       <nav className="flex justify-between align-middle p-4 bg-slate-300 m-4 rounded-md">
