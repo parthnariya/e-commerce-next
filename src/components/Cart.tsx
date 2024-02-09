@@ -1,10 +1,5 @@
 "use client";
-import {
-  UserContext,
-  decreaseCartCount,
-  increaseCartCount,
-  setCartItemCount,
-} from "@/context/userContext";
+import { UserContext, increaseCartCount } from "@/context/userContext";
 import { addItem, removeItem } from "@/utils/apiCalls";
 import Image from "next/image";
 import Link from "next/link";
