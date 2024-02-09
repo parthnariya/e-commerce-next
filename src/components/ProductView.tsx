@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { MouseEventHandler, useEffect, useState } from "react";
 import Loading from "./UI/Loading";
+import { addItem, getProduct } from "@/utils/apiCalls";
 
 type ProductViewPropsType = {
   id: string;
@@ -12,32 +13,6 @@ type ProductDetailsType = {
   description: string;
   price: number;
 };
-async function getProduct(productId: string) {
-  const res = await fetch(`/api/product?productId=${productId}`, {
-    method: "GET",
-  });
-
-  if (!res.ok) {
-    return;
-  }
-  const product = await res.json();
-  return product;
-}
-
-async function addItem(productId: string) {
-  try {
-    const res = await fetch("/api/cart", {
-      method: "POST",
-      body: JSON.stringify({ productId, quantity: 1 }),
-    });
-    if (!res.ok) {
-      return;
-    }
-    const data = await res.json();
-    return data;
-  } catch (e) {
-  }
-}
 
 const ProductView = ({ id }: ProductViewPropsType) => {
   const [loading, setLoading] = useState(false);
@@ -49,7 +24,7 @@ const ProductView = ({ id }: ProductViewPropsType) => {
   const addToCartHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
     setButtonLoading(true);
-    const data = await addItem(id);
+    await addItem(id);
     setButtonLoading(false);
   };
 

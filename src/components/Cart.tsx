@@ -1,10 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
-import CartItem from "./CartItem";
-import Loading from "./UI/Loading";
-import CartIcon from "../assets/cartIcon.svg";
+import { UserContext, increaseCartCount } from "@/context/userContext";
+import { addItem } from "@/utils/apiCalls";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext, useEffect, useState } from "react";
+import CartIcon from "../assets/cartIcon.svg";
+import CartItem from "./CartItem";
+import Loading from "./UI/Loading";
 
 type CartDataType = {
   cartTotal: number;
@@ -25,6 +27,21 @@ type CartDataType = {
 const Cart = () => {
   const [cartData, setCartData] = useState<CartDataType | null>(null);
   const [loading, setLoading] = useState<boolean>();
+  const [, dispatch] = useContext(UserContext);
+  const addToCartHandler = async (productId: string) => {
+    setLoading(true);
+    await addItem(productId);
+    const res = await fetch("api/cart/", { method: "GET" });
+    const data = await res.json();
+    setLoading(false);
+    if (data.cartTotal) {
+      setCartData(() => data);
+      dispatch(increaseCartCount());
+    }
+  };
+  /* const removeFromCartHandler = async (productId:string) => {
+    
+  } */
   useEffect(() => {
     (async function () {
       setLoading(true);
@@ -34,7 +51,6 @@ const Cart = () => {
       if (data.cartTotal) {
         setCartData(() => data);
       }
-      console.log(data);
     })();
   }, []);
   return (
@@ -46,7 +62,10 @@ const Cart = () => {
           <p className="text-gray-600 text-lg font-semibold mb-4">
             Your shopping cart is empty.
           </p>
-          <Link href={'/products'} className="px-6 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300">
+          <Link
+            href={"/products"}
+            className="px-6 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition-colors duration-300"
+          >
             Continue Shopping..
           </Link>
         </div>
@@ -80,6 +99,7 @@ const Cart = () => {
                     product={item.product}
                     quantity={item.quantity}
                     totalPrice={item.totalPrice}
+                    addToCartHandler={addToCartHandler}
                   />
                 ))}
               </div>
@@ -102,7 +122,12 @@ const Cart = () => {
               <hr className="my-2" />
               <div className="flex justify-between mb-2 ">
                 <span className="font-semibold">Total</span>
-                <span className="font-semibold">${cartData.cartTotal}</span>
+                <span className="font-semibold">
+                  $
+                  {cartData.cartTotal +
+                    cartData.shippingCharge +
+                    cartData.taxes}
+                </span>
               </div>
               <button className="bg-indigo-500 text-white py-2 px-4 rounded-lg mt-4 w-full">
                 Checkout

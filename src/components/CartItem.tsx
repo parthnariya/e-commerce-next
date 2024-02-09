@@ -1,5 +1,5 @@
 import Image from "next/image";
-
+import { MouseEventHandler } from "react";
 type CartItemPropType = {
   product: {
     id: string;
@@ -9,9 +9,19 @@ type CartItemPropType = {
   };
   quantity: number;
   totalPrice: number;
+  addToCartHandler: (productId: string) => Promise<void>;
 };
 
-const CartItem = ({ product, quantity, totalPrice }: CartItemPropType) => {
+const CartItem = ({
+  product,
+  quantity,
+  totalPrice,
+  addToCartHandler,
+}: CartItemPropType) => {
+  const addToCartClickHandler: MouseEventHandler = async (e) => {
+    e.preventDefault();
+    await addToCartHandler(product.id);
+  };
   return (
     <div className="table-row w-full">
       <div className="table-cell py-4">
@@ -33,7 +43,12 @@ const CartItem = ({ product, quantity, totalPrice }: CartItemPropType) => {
         <div className="flex items-center">
           <button className="border rounded-md py-2 px-4 mr-2">-</button>
           <span className="text-center w-8">{quantity}</span>
-          <button className="border rounded-md py-2 px-4 ml-2">+</button>
+          <button
+            className="border rounded-md py-2 px-4 ml-2"
+            onClick={addToCartClickHandler}
+          >
+            +
+          </button>
         </div>
       </div>
 
