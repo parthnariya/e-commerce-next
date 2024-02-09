@@ -9,7 +9,10 @@ type CartItemPropType = {
   };
   quantity: number;
   totalPrice: number;
+  // eslint-disable-next-line no-unused-vars
   addToCartHandler: (productId: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
+  removeFromCartHandler: (productId: string) => Promise<void>;
 };
 
 const CartItem = ({
@@ -17,10 +20,15 @@ const CartItem = ({
   quantity,
   totalPrice,
   addToCartHandler,
+  removeFromCartHandler,
 }: CartItemPropType) => {
   const addToCartClickHandler: MouseEventHandler = async (e) => {
     e.preventDefault();
     await addToCartHandler(product.id);
+  };
+  const removeFromCartClickHandler: MouseEventHandler = async (e) => {
+    e.preventDefault();
+    await removeFromCartHandler(product.id);
   };
   return (
     <div className="table-row w-full">
@@ -41,7 +49,12 @@ const CartItem = ({
       </div>
       <div className="table-cell py-4 align-middle">
         <div className="flex items-center">
-          <button className="border rounded-md py-2 px-4 mr-2">-</button>
+          <button
+            className="border rounded-md py-2 px-4 mr-2"
+            onClick={removeFromCartClickHandler}
+          >
+            -
+          </button>
           <span className="text-center w-8">{quantity}</span>
           <button
             className="border rounded-md py-2 px-4 ml-2"

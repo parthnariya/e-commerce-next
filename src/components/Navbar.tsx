@@ -17,7 +17,8 @@ const Navbar = () => {
   useEffect(() => {
     (async () => {
       const count = await getCartItemCount();
-      dispatch(setCartItemCount(count));
+
+      dispatch(setCartItemCount(count === null ? 0 : count));
     })();
   }, [dispatch]);
   return (

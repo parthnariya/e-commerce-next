@@ -6,8 +6,11 @@ type UserContextStateType = {
 };
 
 export enum UserContextStateActionKind {
+  // eslint-disable-next-line no-unused-vars
   INCREASE_CART_ITEM_COUNT = "INCREASE_CART_ITEM_COUNT",
+  // eslint-disable-next-line no-unused-vars
   DECREASE_CART_ITEM_COUNT = "DECREASE_CART_ITEM_COUNT",
+  // eslint-disable-next-line no-unused-vars
   SET_CART_ITEM_COUNT = "SET_CART_ITEM_COUNT",
 }
 

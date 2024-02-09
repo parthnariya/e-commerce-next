@@ -1,6 +1,11 @@
 "use client";
-import { UserContext, increaseCartCount } from "@/context/userContext";
-import { addItem } from "@/utils/apiCalls";
+import {
+  UserContext,
+  decreaseCartCount,
+  increaseCartCount,
+  setCartItemCount,
+} from "@/context/userContext";
+import { addItem, removeItem } from "@/utils/apiCalls";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
@@ -39,17 +44,36 @@ const Cart = () => {
       dispatch(increaseCartCount());
     }
   };
-  /* const removeFromCartHandler = async (productId:string) => {
-    
-  } */
+  const removeFromCartHandler = async (productId: string) => {
+    setLoading(true);
+    await removeItem(productId);
+    const res = await fetch("api/cart/", { method: "GET" });
+    const data = await res.json();
+    setLoading(false);
+    if (
+      "cartTotal" in data &&
+      "cartItems" in data &&
+      data.cartItems.length > 0
+    ) {
+      setCartData(() => data);
+    } else {
+      setCartData(() => null);
+    }
+  };
   useEffect(() => {
     (async function () {
       setLoading(true);
       const res = await fetch("api/cart/", { method: "GET" });
       const data = await res.json();
       setLoading(false);
-      if (data.cartTotal) {
+      if (
+        "cartTotal" in data &&
+        "cartItems" in data &&
+        data.cartItems.length > 0
+      ) {
         setCartData(() => data);
+      } else {
+        setCartData(() => null);
       }
     })();
   }, []);
@@ -100,6 +124,7 @@ const Cart = () => {
                     quantity={item.quantity}
                     totalPrice={item.totalPrice}
                     addToCartHandler={addToCartHandler}
+                    removeFromCartHandler={removeFromCartHandler}
                   />
                 ))}
               </div>

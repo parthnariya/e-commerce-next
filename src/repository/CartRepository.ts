@@ -60,7 +60,7 @@ export class CartRepository {
           },
           data: {
             quantity: cartItemExist.quantity + 1,
-            totalPrice: cartItemExist.quantity  * product.price,
+            totalPrice: cartItemExist.totalPrice + quantity * product.price,
           },
         });
       } else {
@@ -127,5 +127,69 @@ export class CartRepository {
       });
     }
     return result;
+  }
+  async removeItemFromCart(
+    userId: string,
+    productId: string,
+    quantity: number
+  ) {
+    const product = await prisma.product.findFirstOrThrow({
+      where: {
+        id: productId,
+      },
+    });
+    if (!product) return { status: "product not found" };
+    const cart = await prisma.cart.findFirst({
+      where: {
+        userId,
+      },
+    });
+    try {
+      if (!cart) return { status: "Cart not found" };
+      const cartItemExist = await prisma.cartItem.findFirst({
+        select: {
+          id: true,
+          quantity: true,
+          totalPrice: true,
+        },
+        where: {
+          cartId: cart.id,
+          productId,
+        },
+      });
+      if (!cartItemExist) return { status: "Cart Item not found" };
+      if (cartItemExist.quantity === 1) {
+        await prisma.cartItem.delete({
+          where: {
+            id: cartItemExist.id,
+          },
+        });
+      } else {
+        await prisma.cartItem.update({
+          data: {
+            quantity: cartItemExist.quantity - 1,
+            totalPrice: cartItemExist.totalPrice - product.price,
+          },
+          where: {
+            id: cartItemExist.id,
+          },
+        });
+      }
+      await prisma.cart.update({
+        where: {
+          id: cart.id,
+        },
+        data: {
+          cartTotal: cart.cartTotal - product.price * quantity,
+          shippingCharge:
+            cart.shippingCharge + cart.cartTotal - product.price * quantity >
+            500
+              ? 50
+              : 0,
+        },
+      });
+
+      return { status: "Product Removed Successfully" };
+    } catch (e) {}
   }
 }

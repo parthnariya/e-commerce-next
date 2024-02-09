@@ -1,8 +1,8 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import Product from "./Product";
+import { useEffect, useState } from "react";
 import Pagination from "./Pagination";
+import Product from "./Product";
 import Loading from "./UI/Loading";
 type ProductType = {
   price: number;

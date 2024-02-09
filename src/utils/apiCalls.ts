@@ -23,3 +23,16 @@ export async function getProduct(productId: string) {
   const product = await res.json();
   return product;
 }
+export async function removeItem(productId: string) {
+  try {
+    const res = await fetch("/api/cart", {
+      method: "DELETE",
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    if (!res.ok) {
+      return;
+    }
+    const data = await res.json();
+    return data;
+  } catch (e) {}
+}
