@@ -1,6 +1,10 @@
 "use client";
+import { UserContext, increaseCartCount } from "@/context/userContext";
+import { addItem } from "@/utils/apiCalls";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
+import { MouseEventHandler, useContext, useState } from "react";
 
 type ProductPropsType = {
   id: string;
@@ -9,6 +13,21 @@ type ProductPropsType = {
   image: string;
 };
 const Product = (props: ProductPropsType) => {
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [, dispatch] = useContext(UserContext);
+  const clerk = useClerk();
+  const { isSignedIn } = useAuth();
+  const addCartHandler: MouseEventHandler = async (e) => {
+    e.preventDefault();
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
+    } else {
+      setButtonLoading(true);
+      await addItem(props.id);
+      dispatch(increaseCartCount());
+      setButtonLoading(false);
+    }
+  };
   return (
     <Link href={`/product/${props.id}`}>
       <figure className="flex flex-col border-solid border-4 p-2 rounded-3xl cursor-pointer">
@@ -23,8 +42,11 @@ const Product = (props: ProductPropsType) => {
           <h2 className="text-zinc-950 font-bold">{props.title}</h2>
           <div className="flex justify-between w-full">
             <p className="text-zinc-800 font-medium">$ {props.price}</p>
-            <button className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700">
-              Add to Cart
+            <button
+              className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700"
+              onClick={addCartHandler}
+            >
+              {buttonLoading ? "Adding..." : "Add to Cart"}
             </button>
           </div>
         </figcaption>

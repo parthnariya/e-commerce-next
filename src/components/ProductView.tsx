@@ -1,6 +1,8 @@
 "use client";
+import { addItem, getProduct } from "@/utils/apiCalls";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import Loading from "./UI/Loading";
 
 type ProductViewPropsType = {
@@ -12,22 +14,27 @@ type ProductDetailsType = {
   description: string;
   price: number;
 };
-async function getProduct(productId: string) {
-  const res = await fetch(`/api/product?productId=${productId}`, {
-    method: "GET",
-  });
 
-  if (!res.ok) {
-    return;
-  }
-  const product = await res.json();
-  return product;
-}
 const ProductView = ({ id }: ProductViewPropsType) => {
   const [loading, setLoading] = useState(false);
+  const { isSignedIn } = useAuth();
+  const clerk = useClerk();
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [productData, setProductData] = useState<
     ProductDetailsType | undefined
   >();
+
+  const addToCartHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
+    }
+    if (isSignedIn) {
+      setButtonLoading(true);
+      await addItem(id);
+      setButtonLoading(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -67,8 +74,11 @@ const ProductView = ({ id }: ProductViewPropsType) => {
               <span className="text-lg font-semibold text-gray-900 mr-2">
                 $ {productData.price}
               </span>
-              <button className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700">
-                Add to Cart
+              <button
+                onClick={addToCartHandler}
+                className="py-1 px-2 border-indigo-700 border-solid border-2 rounded-md hover:text-gray-50 text-indigo-700 hover:bg-indigo-700"
+              >
+                {buttonLoading ? "Adding...." : "Add to Cart"}
               </button>
             </div>
           </div>
