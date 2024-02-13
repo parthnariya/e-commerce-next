@@ -38,3 +38,15 @@ export async function removeItem(productId: string) {
     return data;
   } catch (e) {}
 }
+export async function removeCart() {
+  try {
+    const res = await fetch("/api/cart/deleteCart", {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      return;
+    }
+    const data = await res.json();
+    return data;
+  } catch (e) {}
+}

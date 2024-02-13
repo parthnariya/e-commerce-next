@@ -192,4 +192,14 @@ export class CartRepository {
       return { status: "Product Removed Successfully" };
     } catch (e) {}
   }
+  async removeCart(userId: string) {
+    const cart = await prisma.cart.findFirst({ where: { userId } });
+    if (!cart) {
+      return false;
+    } else {
+      await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+      await prisma.cart.delete({ where: { id: cart.id } });
+      return true;
+    }
+  }
 }

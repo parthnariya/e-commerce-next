@@ -3,11 +3,12 @@ import {
   UserContext,
   decreaseCartCount,
   increaseCartCount,
+  setCartItemCount,
 } from "@/context/userContext";
-import { addItem, removeItem } from "@/utils/apiCalls";
+import { addItem, removeCart, removeItem } from "@/utils/apiCalls";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
+import { MouseEventHandler, useContext, useEffect, useState } from "react";
 import CartIcon from "../assets/cartIcon.svg";
 import CartItem from "./CartItem";
 import Loading from "./UI/Loading";
@@ -71,6 +72,15 @@ const Cart = () => {
       dispatch(decreaseCartCount());
       setLoading(false);
     }
+  };
+  const checkOutHandler: MouseEventHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    await removeCart();
+    setCartData(() => null);
+    dispatch(setCartItemCount(0));
+    setLoading(false);
   };
   useEffect(() => {
     isSignedIn &&
@@ -167,7 +177,10 @@ const Cart = () => {
                     cartData.taxes}
                 </span>
               </div>
-              <button className="bg-indigo-500 text-white py-2 px-4 rounded-lg mt-4 w-full">
+              <button
+                className="bg-indigo-500 text-white py-2 px-4 rounded-lg mt-4 w-full"
+                onClick={checkOutHandler}
+              >
                 Checkout
               </button>
             </div>
