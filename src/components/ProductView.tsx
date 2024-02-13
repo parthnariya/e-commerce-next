@@ -1,8 +1,9 @@
 "use client";
+import { addItem, getProduct } from "@/utils/apiCalls";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import { MouseEventHandler, useEffect, useState } from "react";
 import Loading from "./UI/Loading";
-import { addItem, getProduct } from "@/utils/apiCalls";
 
 type ProductViewPropsType = {
   id: string;
@@ -16,6 +17,8 @@ type ProductDetailsType = {
 
 const ProductView = ({ id }: ProductViewPropsType) => {
   const [loading, setLoading] = useState(false);
+  const { isSignedIn } = useAuth();
+  const clerk = useClerk();
   const [buttonLoading, setButtonLoading] = useState(false);
   const [productData, setProductData] = useState<
     ProductDetailsType | undefined
@@ -23,9 +26,14 @@ const ProductView = ({ id }: ProductViewPropsType) => {
 
   const addToCartHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
-    setButtonLoading(true);
-    await addItem(id);
-    setButtonLoading(false);
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
+    }
+    if (isSignedIn) {
+      setButtonLoading(true);
+      await addItem(id);
+      setButtonLoading(false);
+    }
   };
 
   useEffect(() => {

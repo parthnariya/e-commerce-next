@@ -13,15 +13,17 @@ export async function addItem(productId: string) {
 }
 
 export async function getProduct(productId: string) {
-  const res = await fetch(`/api/product?productId=${productId}`, {
-    method: "GET",
-  });
+  try {
+    const res = await fetch(`/api/product?productId=${productId}`, {
+      method: "GET",
+    });
 
-  if (!res.ok) {
-    return;
-  }
-  const product = await res.json();
-  return product;
+    if (!res.ok) {
+      return;
+    }
+    const product = await res.json();
+    return product;
+  } catch (e) {}
 }
 export async function removeItem(productId: string) {
   try {

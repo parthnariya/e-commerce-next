@@ -4,9 +4,8 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const { userId } = getAuth(request);
-
   if (!userId) {
-    return Response.json("Unauthorize", { status: 401 });
+    return new Response("Unauthorize", { status: 401 });
   }
   const cartRepository = new CartRepository();
   try {

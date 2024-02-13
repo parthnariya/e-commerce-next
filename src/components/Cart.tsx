@@ -1,5 +1,9 @@
 "use client";
-import { UserContext, increaseCartCount } from "@/context/userContext";
+import {
+  UserContext,
+  decreaseCartCount,
+  increaseCartCount,
+} from "@/context/userContext";
 import { addItem, removeItem } from "@/utils/apiCalls";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import CartIcon from "../assets/cartIcon.svg";
 import CartItem from "./CartItem";
 import Loading from "./UI/Loading";
+import { useAuth, useClerk } from "@clerk/nextjs";
 
 type CartDataType = {
   cartTotal: number;
@@ -28,40 +33,33 @@ const Cart = () => {
   const [cartData, setCartData] = useState<CartDataType | null>(null);
   const [loading, setLoading] = useState<boolean>();
   const [, dispatch] = useContext(UserContext);
+  const clerk = useClerk();
+  const { isSignedIn } = useAuth();
   const addToCartHandler = async (productId: string) => {
-    setLoading(true);
-    await addItem(productId);
-    const res = await fetch("api/cart/", { method: "GET" });
-    const data = await res.json();
-    setLoading(false);
-    if (data.cartTotal) {
-      setCartData(() => data);
-      dispatch(increaseCartCount());
-    }
-  };
-  const removeFromCartHandler = async (productId: string) => {
-    setLoading(true);
-    await removeItem(productId);
-    const res = await fetch("api/cart/", { method: "GET" });
-    const data = await res.json();
-    setLoading(false);
-    if (
-      "cartTotal" in data &&
-      "cartItems" in data &&
-      data.cartItems.length > 0
-    ) {
-      setCartData(() => data);
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
     } else {
-      setCartData(() => null);
-    }
-  };
-  useEffect(() => {
-    (async function () {
       setLoading(true);
+      await addItem(productId);
       const res = await fetch("api/cart/", { method: "GET" });
       const data = await res.json();
       setLoading(false);
+      if (data.cartTotal) {
+        setCartData(() => data);
+        dispatch(increaseCartCount());
+      }
+    }
+  };
+  const removeFromCartHandler = async (productId: string) => {
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
+    } else {
+      setLoading(true);
+      await removeItem(productId);
+      const res = await fetch("api/cart/", { method: "GET" });
+      const data = await res.json();
       if (
+        data !== null &&
         "cartTotal" in data &&
         "cartItems" in data &&
         data.cartItems.length > 0
@@ -70,8 +68,28 @@ const Cart = () => {
       } else {
         setCartData(() => null);
       }
-    })();
-  }, []);
+      dispatch(decreaseCartCount());
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    isSignedIn &&
+      (async function () {
+        setLoading(true);
+        const res = await fetch("api/cart/", { method: "GET" });
+        const data = await res.json();
+        setLoading(false);
+        if (
+          "cartTotal" in data &&
+          "cartItems" in data &&
+          data.cartItems.length > 0
+        ) {
+          setCartData(() => data);
+        } else {
+          setCartData(() => null);
+        }
+      })();
+  }, [isSignedIn]);
   return (
     <div className="mx-16 my-3 flex flex-col gap-2 items-center h-full">
       {loading && <Loading />}

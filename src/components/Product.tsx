@@ -1,6 +1,7 @@
 "use client";
 import { UserContext, increaseCartCount } from "@/context/userContext";
 import { addItem } from "@/utils/apiCalls";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { MouseEventHandler, useContext, useState } from "react";
@@ -14,12 +15,18 @@ type ProductPropsType = {
 const Product = (props: ProductPropsType) => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [, dispatch] = useContext(UserContext);
+  const clerk = useClerk();
+  const { isSignedIn } = useAuth();
   const addCartHandler: MouseEventHandler = async (e) => {
     e.preventDefault();
-    setButtonLoading(true);
-    await addItem(props.id);
-    dispatch(increaseCartCount());
-    setButtonLoading(false);
+    if (!isSignedIn) {
+      clerk.redirectToSignIn({});
+    } else {
+      setButtonLoading(true);
+      await addItem(props.id);
+      dispatch(increaseCartCount());
+      setButtonLoading(false);
+    }
   };
   return (
     <Link href={`/product/${props.id}`}>
